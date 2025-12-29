@@ -1,6 +1,0 @@
-User-agent: *
-Disallow: /wp-admin/
-Allow: /wp-admin/admin-ajax.php
-
-Sitemap: https://veteranbildagen.no/wp-sitemap.xml
-Disallow: /*?jobs=*Disallow: /*?*jobs=*
