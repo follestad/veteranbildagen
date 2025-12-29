@@ -1,0 +1,85 @@
+---
+import '../styles/global.scss';
+
+interface Props {
+  title: string;
+  currentPage?: string;
+}
+
+const { title, currentPage = '' } = Astro.props;
+
+const menuItems = [
+  { href: '/', label: 'Invitasjon', id: 'invitasjon' },
+  { href: '/galleri/', label: 'Galleri', id: 'galleri' },
+  { href: '/presse/', label: 'Presse', id: 'presse' },
+  { href: '/video/', label: 'Video', id: 'video' },
+  { href: '/dvd/', label: 'DVD', id: 'dvd' },
+  { href: '/om-dagen/', label: 'Om Dagen', id: 'om-dagen' },
+  { href: 'https://www.facebook.com/veteranbildagen', label: 'Facebook', id: 'facebook', external: true },
+];
+---
+
+<!doctype html>
+<html lang="nb-NO" class="no-js">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
+  <body id="body">
+    <div id="wrapper">
+      <header role="banner">
+        <h1><a id="site_logo" href="/">Veteranbildagen på Tofte</a></h1>
+
+        <a href="#nav" class="nav-toggle">Menu</a>
+
+        <nav role="navigation" id="nav" class="nav-collapse">
+          <ul id="menu-hovedmeny" class="menu">
+            {menuItems.map((item) => (
+              <li class={currentPage === item.id ? 'active current_page_item' : ''}>
+                <a
+                  href={item.href}
+                  {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  {...(currentPage === item.id ? { 'aria-current': 'page' } : {})}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <script is:inline>
+        // Simple responsive nav toggle
+        document.addEventListener('DOMContentLoaded', function() {
+          const toggle = document.querySelector('.nav-toggle');
+          const nav = document.querySelector('.nav-collapse');
+
+          if (toggle && nav) {
+            document.documentElement.classList.add('js');
+
+            toggle.addEventListener('click', function(e) {
+              e.preventDefault();
+              nav.classList.toggle('opened');
+              toggle.classList.toggle('active');
+            });
+          }
+        });
+      </script>
+
+      <section>
+        <article>
+          <slot />
+        </article>
+      </section>
+
+      <footer>
+        Einar Schie - einasc@online.no - tlf: 91730233
+        <span>Nettside utviklet av <a href="https://bonsay.no">Bonsay</a></span>
+      </footer>
+    </div>
+  </body>
+</html>

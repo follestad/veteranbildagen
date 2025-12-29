@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+
+export async function getStaticPaths() {
+  const galleryEntries = await getCollection('gallery');
+  return galleryEntries.map((entry) => ({
+    params: { year: entry.data.year.toString() },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { year, title, images } = entry.data;
+
+// Dynamic imports for gallery images based on year
+const imageModules = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/images/gallery/**/*.jpg',
+  { eager: true }
+);
+
+function getImage(filename: string): ImageMetadata | undefined {
+  const path = `/src/assets/images/gallery/${year}/${filename}`;
+  return imageModules[path]?.default;
+}
+---
+
+<Layout title={`${title} - Veteranbildagen på Tofte`} currentPage="galleri">
+  <h1>{title}</h1>
+  <p><a href="/galleri/">&larr; Tilbake til galleri</a></p>
+
+  <div class="gallery">
+    {images.map((filename) => {
+      const imageSrc = getImage(filename);
+      return imageSrc ? (
+        <figure class="gallery-item">
+          <a href={imageSrc.src} target="_blank">
+            <Image
+              src={imageSrc}
+              alt={`Veteranbildagen ${year}`}
+              width={300}
+              height={200}
+            />
+          </a>
+        </figure>
+      ) : null;
+    })}
+  </div>
+</Layout>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .gallery-item {
+    margin: 0;
+  }
+
+  .gallery-item a {
+    display: block;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @media (max-width: 500px) {
+    .gallery {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
