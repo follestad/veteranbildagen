@@ -1,0 +1,36 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'Veteranbildagen på Tofte - Årlig veteranbiltreff i Tofte, Hurum. Klassiske biler, grillmat og god stemning.',
+  canonicalUrl,
+  ogImage = '/images/veteranbildagen-tofte-logo.png',
+} = Astro.props;
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://veteranbildagen.no';
+const canonical = canonicalUrl ?? `${siteUrl}${Astro.url.pathname}`;
+const fullOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={fullOgImage} />
+<meta property="og:site_name" content="Veteranbildagen på Tofte" />
+<meta property="og:locale" content="nb_NO" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={fullOgImage} />

@@ -4,15 +4,20 @@ import { Image } from 'astro:assets';
 import dvdImage from '../assets/images/veteranbildagen-dvd.png';
 ---
 
-<Layout title="DVD - Veteranbildagen på Tofte" currentPage="dvd">
+<Layout
+  title="DVD – Veteranbildagen på Tofte 10-årsjubileum"
+  description="Kjøp jubileets-DVD fra Veteranbildagen på Tofte. Bestill fra Wenches Bokhandel på Tofte eller kontakt Sigmund Aarnes. Pris 200 kr."
+  currentPage="dvd"
+>
   <h1>DVD</h1>
   <p>Vi har laget en DVD i forbindelse med 10 års jubeleumet til Veteranbildagen på Tofte. Denne kan kjøpes på Wenches Bokhandel på Tofte eller du kan sende en e-post til Sigmund Aarnes på epost saa@abns.on. Prisen for filen er 200 kr.</p>
   <div class="imgFull">
     <Image
       src={dvdImage}
-      alt="Veteranbildagen på Tofte DVD"
+      alt="Forsiden til jubileums-DVD fra Veteranbildagen på Tofte"
       width={800}
       height={1113}
+      loading="lazy"
     />
   </div>
 </Layout>

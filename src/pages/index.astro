@@ -1,28 +1,23 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import VideoEmbed from "../components/VideoEmbed.astro";
 ---
 
-<Layout title="Veteranbildagen på Tofte" currentPage="invitasjon">
-    <h2><a href="/">Invitasjon til Veteranbildagen på Tofte</a></h2>
+<Layout
+  title="Veteranbildagen på Tofte – Veteranbiltreff lørdag 6. september 2025"
+  description="Kom til Veteranbildagen på Tofte – et av Norges beste veteranbiltreff! Gratis inngang for publikum, grilling, premieutdeling og over 250 klasssiske biler."
+  currentPage="invitasjon"
+>
+    <h1>Invitasjon til Veteranbildagen på Tofte</h1>
     <p>
         Neste veteranbildag på Tofte markerer vårt 20-årsjubileum og arrangeres <a
             href="https://tidia.no/kalender/2025">lørdag 6. september 2025</a
         >. Følg oss på <a href="https://www.facebook.com/veteranbildagen">Facebook</a> for oppdateringer!
     </p>
 
-    <div class="video">
-        <iframe
-            title="Veteranbildagen på Tofte 2021"
-            width="500"
-            height="281"
-            src="https://www.youtube.com/embed/UGSnLowNX4Q"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen></iframe>
-    </div>
+    <VideoEmbed src="https://www.youtube.com/embed/UGSnLowNX4Q" title="Veteranbildagen på Tofte 2021" />
 
-    <h3>20-årsjubileum for Veteranbildagen på Tofte arrangeres lørdag 6. september 2025.</h3>
+    <h2>20-årsjubileum for Veteranbildagen på Tofte arrangeres lørdag 6. september 2025.</h2>
     <p>
         Det begynte med 40 biler for 20 år siden, på det meste har det vært nesten 400, og kan glede oss over
         et godt rykte i miljøet. Norsk Motorveteran kåret oss til det fjerde beste treffet i Norge! Særlig
@@ -35,7 +30,7 @@ import Layout from "../layouts/Layout.astro";
         10:00 til 15:00.
     </p>
 
-    <h3>Bilene blir stående i gata i hele dette tidsrommet.</h3>
+    <h2>Bilene blir stående i gata i hele dette tidsrommet.</h2>
     <p>
         Fra klokken 12:00 serveres det gratis hamburgere til de som har betalt for bilen og fått «matkupong»
         utlevert. Drikke fås kjøpt på samme sted.

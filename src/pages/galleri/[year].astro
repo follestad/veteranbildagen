@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 
 export async function getStaticPaths() {
   const galleryEntries = await getCollection('gallery');
@@ -14,65 +14,234 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { year, title, images } = entry.data;
 
-// Dynamic imports for gallery images based on year
 const imageModules = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/images/gallery/**/*.jpg',
   { eager: true }
 );
 
-function getImage(filename: string): ImageMetadata | undefined {
+function getImageMeta(filename: string): ImageMetadata | undefined {
   const path = `/src/assets/images/gallery/${year}/${filename}`;
   return imageModules[path]?.default;
 }
+
+// Generate full-size WebP URLs for lightbox
+const processedImages = await Promise.all(
+  images.map(async (filename, i) => {
+    const meta = getImageMeta(filename);
+    if (!meta) return null;
+    const full = await getImage({ src: meta, width: 1400, format: 'webp', quality: 85 });
+    return { meta, fullSrc: full.src, index: i };
+  })
+);
 ---
 
-<Layout title={`${title} - Veteranbildagen på Tofte`} currentPage="galleri">
+<Layout
+  title={`Bilder fra ${year} – Veteranbildagen på Tofte`}
+  description={`Bildegalleri fra Veteranbildagen på Tofte ${year}. Se ${images.length} bilder av klassiske veteranbiler fra årets treff i Tofte, Hurum.`}
+  currentPage="galleri"
+>
   <h1>{title}</h1>
   <p><a href="/galleri/">&larr; Tilbake til galleri</a></p>
 
-  <div class="gallery">
-    {images.map((filename) => {
-      const imageSrc = getImage(filename);
-      return imageSrc ? (
-        <figure class="gallery-item">
-          <a href={imageSrc.src} target="_blank">
-            <Image
-              src={imageSrc}
-              alt={`Veteranbildagen ${year}`}
-              width={300}
-              height={200}
-            />
-          </a>
-        </figure>
-      ) : null;
-    })}
+  <div class="gallery" id="gallery">
+    {processedImages.map((item, i) => item ? (
+      <figure class="gallery-item">
+        <button
+          type="button"
+          class="gallery-thumb"
+          data-index={i}
+          data-src={item.fullSrc}
+          aria-label={`Åpne bilde ${i + 1} av ${images.length}`}
+        >
+          <Image
+            src={item.meta}
+            alt={`Veteranbildagen ${year}, bilde ${i + 1}`}
+            width={300}
+            height={200}
+            loading={i < 4 ? 'eager' : 'lazy'}
+          />
+        </button>
+      </figure>
+    ) : null)}
   </div>
+
+  <dialog id="lightbox" aria-label="Bildegalleri">
+    <button type="button" id="lb-close" aria-label="Lukk">&times;</button>
+    <button type="button" id="lb-prev" aria-label="Forrige bilde">&#8249;</button>
+    <button type="button" id="lb-next" aria-label="Neste bilde">&#8250;</button>
+    <figure id="lb-figure">
+      <img id="lb-img" src="" alt="" />
+    </figure>
+    <p id="lb-counter" aria-live="polite"></p>
+  </dialog>
 </Layout>
 
+<script define:vars={{ total: images.length }}>
+  const dialog = document.getElementById('lightbox');
+  const img = document.getElementById('lb-img');
+  const counter = document.getElementById('lb-counter');
+  const thumbs = [...document.querySelectorAll('.gallery-thumb')];
+
+  let current = 0;
+
+  function show(index) {
+    current = (index + total) % total;
+    const btn = thumbs[current];
+    img.src = btn.dataset.src;
+    img.alt = btn.getAttribute('aria-label');
+    counter.textContent = `${current + 1} / ${total}`;
+    // Preload neighbours
+    [current - 1, current + 1].forEach(n => {
+      const nb = thumbs[(n + total) % total];
+      if (nb) new Image().src = nb.dataset.src;
+    });
+  }
+
+  function open(index) {
+    show(index);
+    dialog.showModal();
+  }
+
+  function close() {
+    dialog.close();
+    thumbs[current]?.focus();
+  }
+
+  thumbs.forEach((btn, i) => btn.addEventListener('click', () => open(i)));
+
+  document.getElementById('lb-close').addEventListener('click', close);
+  document.getElementById('lb-prev').addEventListener('click', () => show(current - 1));
+  document.getElementById('lb-next').addEventListener('click', () => show(current + 1));
+
+  // Close on backdrop click
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) close(); });
+
+  // Keyboard navigation
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); show(current - 1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); show(current + 1); }
+  });
+  // ESC is handled natively by <dialog>
+  dialog.addEventListener('close', () => thumbs[current]?.focus());
+</script>
+
 <style>
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .gallery-item {
-    margin: 0;
-  }
-
-  .gallery-item a {
+  .gallery-thumb {
     display: block;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: 2px solid var(--color-border);
+    cursor: pointer;
+    transition: border-color 0.15s;
   }
 
-  .gallery-item img {
+  .gallery-thumb:hover,
+  .gallery-thumb:focus-visible {
+    border-color: var(--color-link);
+    outline: none;
+  }
+
+  .gallery-thumb img {
+    display: block;
     width: 100%;
     height: auto;
-    display: block;
   }
 
-  @media (max-width: 500px) {
-    .gallery {
-      grid-template-columns: 1fr;
+  /* Lightbox */
+  #lightbox {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.92);
+    border: none;
+  }
+
+  #lightbox[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #lightbox::backdrop {
+    background: transparent;
+  }
+
+  #lb-figure {
+    margin: 0;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #lb-img {
+    display: block;
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    border: none;
+  }
+
+  #lb-close,
+  #lb-prev,
+  #lb-next {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.15s;
+  }
+
+  #lb-close,
+  #lb-prev,
+  #lb-next {
+    &:hover,
+    &:focus-visible {
+      background: rgba(255, 255, 255, 0.2);
+      outline: 2px solid #fff;
+      outline-offset: 2px;
     }
+  }
+
+  #lb-close {
+    top: 16px;
+    right: 16px;
+    font-size: 36px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  #lb-prev,
+  #lb-next {
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    width: 56px;
+    height: 80px;
+    border-radius: 4px;
+  }
+
+  #lb-prev { left: 12px; }
+  #lb-next { right: 12px; }
+
+  #lb-counter {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    margin: 0;
+    pointer-events: none;
   }
 </style>

@@ -4,15 +4,20 @@ import { Image } from 'astro:assets';
 import toftetreffImage from '../assets/images/Toftetreff.jpg';
 ---
 
-<Layout title="Om Dagen - Veteranbildagen på Tofte" currentPage="om-dagen">
+<Layout
+  title="Om Veteranbildagen på Tofte – Historikk og bakgrunn"
+  description="Les om Veteranbildagen på Tofte – et unikt veteranbiltreff på Hurum med røtter tilbake til 2005. Finn ut hva som gjør dette treffet spesielt."
+  currentPage="om-dagen"
+>
   <h1>Hurums svar på "Goodwood Revival"</h1>
 
   <div class="imgFull">
     <Image
       src={toftetreffImage}
-      alt="Toftetreff"
+      alt="Veteranbiler parkert langs gaten på Tofte under Veteranbildagen"
       width={800}
       height={598}
+      loading="eager"
     />
   </div>
 
