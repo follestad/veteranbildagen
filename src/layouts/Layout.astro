@@ -1,88 +1,92 @@
 ---
-import '../styles/global.scss';
-import SEO from '../components/SEO.astro';
+import "../styles/global.scss";
+import SEO from "../components/SEO.astro";
 
 interface Props {
-  title: string;
-  description?: string;
-  currentPage?: string;
+    title: string;
+    description?: string;
+    currentPage?: string;
 }
 
-const { title, description, currentPage = '' } = Astro.props;
+const { title, description, currentPage = "" } = Astro.props;
 
 const menuItems = [
-  { href: '/', label: 'Invitasjon', id: 'invitasjon' },
-  { href: '/galleri/', label: 'Galleri', id: 'galleri' },
-  { href: '/presse/', label: 'Presse', id: 'presse' },
-  { href: '/video/', label: 'Video', id: 'video' },
-  { href: '/dvd/', label: 'DVD', id: 'dvd' },
-  { href: '/om-dagen/', label: 'Om Dagen', id: 'om-dagen' },
-  { href: 'https://www.facebook.com/veteranbildagen', label: 'Facebook', id: 'facebook', external: true },
+    { href: "/", label: "Invitasjon", id: "invitasjon" },
+    { href: "/galleri/", label: "Galleri", id: "galleri" },
+    { href: "/presse/", label: "Presse", id: "presse" },
+    { href: "/video/", label: "Video", id: "video" },
+    { href: "/dvd/", label: "DVD", id: "dvd" },
+    { href: "/om-dagen/", label: "Om Dagen", id: "om-dagen" },
+    { href: "https://www.facebook.com/veteranbildagen", label: "Facebook", id: "facebook", external: true },
 ];
 ---
 
 <!doctype html>
 <html lang="nb">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <SEO title={title} description={description} />
-    <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preload" as="image" href="/images/veteranbildagen-tofte-logo.png" />
-  </head>
-  <body>
-    <a href="#main-content" class="skip-to-content">Hopp til innhold</a>
-    <div id="wrapper">
-      <header>
-        <p class="site-title"><a id="site_logo" href="/">Veteranbildagen på Tofte</a></p>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <SEO title={title} description={description} />
+        <meta name="generator" content={Astro.generator} />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="preload" as="image" href="/images/veteranbildagen-tofte-logo.png" />
+    </head>
+    <body>
+        <a href="#main-content" class="skip-to-content">Hopp til innhold</a>
+        <div id="wrapper">
+            <header>
+                <p class="site-title"><a id="site_logo" href="/">Veteranbildagen på Tofte</a></p>
 
-        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav">
-          <span class="sr-only">Meny</span>
-        </button>
+                <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav">
+                    <span class="sr-only">Meny</span>
+                </button>
 
-        <nav id="nav" class="nav-collapse" aria-label="Hovedmeny">
-          <ul id="menu-hovedmeny" class="menu">
-            {menuItems.map((item) => (
-              <li class={currentPage === item.id ? 'active current_page_item' : ''}>
-                <a
-                  href={item.href}
-                  {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  {...(currentPage === item.id ? { 'aria-current': 'page' } : {})}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
+                <nav id="nav" class="nav-collapse" aria-label="Hovedmeny">
+                    <ul id="menu-hovedmeny" class="menu">
+                        {
+                            menuItems.map((item) => (
+                                <li class={currentPage === item.id ? "active current_page_item" : ""}>
+                                    <a
+                                        href={item.href}
+                                        {...(item.external
+                                            ? { target: "_blank", rel: "noopener noreferrer" }
+                                            : {})}
+                                        {...(currentPage === item.id ? { "aria-current": "page" } : {})}
+                                    >
+                                        {item.label}
+                                    </a>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </nav>
+            </header>
 
-      <script is:inline>
-        document.addEventListener('DOMContentLoaded', function() {
-          const toggle = document.querySelector('.nav-toggle');
-          const nav = document.querySelector('.nav-collapse');
+            <script is:inline>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const toggle = document.querySelector(".nav-toggle");
+                    const nav = document.querySelector(".nav-collapse");
 
-          if (toggle && nav) {
-            document.documentElement.classList.add('js');
+                    if (toggle && nav) {
+                        document.documentElement.classList.add("js");
 
-            toggle.addEventListener('click', function() {
-              const isOpen = nav.classList.toggle('opened');
-              toggle.classList.toggle('active');
-              toggle.setAttribute('aria-expanded', isOpen.toString());
-            });
-          }
-        });
-      </script>
+                        toggle.addEventListener("click", function () {
+                            const isOpen = nav.classList.toggle("opened");
+                            toggle.classList.toggle("active");
+                            toggle.setAttribute("aria-expanded", isOpen.toString());
+                        });
+                    }
+                });
+            </script>
 
-      <main id="main-content">
-        <slot />
-      </main>
+            <main id="main-content">
+                <slot />
+            </main>
 
-      <footer>
-        <p>Einar Schie - einasc@online.no - tlf: 91730233</p>
-        <p>Nettside utviklet av <a href="https://bonsay.no">Bonsay</a></p>
-      </footer>
-    </div>
-  </body>
+            <footer>
+                <p>Einar Schie - einasc@online.no - tlf: 91730233</p>
+                <p>Laget med hjelp av <a href="https://fjellvarden.no">Fjellvarden</a></p>
+            </footer>
+        </div>
+    </body>
 </html>
